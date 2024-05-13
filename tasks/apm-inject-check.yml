@@ -16,7 +16,7 @@
 
 - name: Default to list of packages rather than "all"
   set_fact:
-    datadog_apm_instrumentation_libraries: ["java", "js", "dotnet", "python", "ruby"]
+    datadog_apm_instrumentation_libraries: [java, js, dotnet, python, ruby]
   when: datadog_apm_instrumentation_libraries == ["all"]
 
 - name: Check if docker daemon config dir exists
@@ -88,15 +88,11 @@
 - name: Deprecation variable - datadog_apm_instrumentation_languages
   set_fact:
     datadog_apm_instrumentation_libraries: "{{ datadog_apm_instrumentation_languages }}"
-  when: datadog_apm_instrumentation_libraries is undefined and
-    datadog_apm_instrumentation_libraries is defined
+  when: datadog_apm_instrumentation_libraries is undefined and datadog_apm_instrumentation_libraries is defined
 
 - name: Remove latest tag and append -1 when version number specified in pinned APM tracer libraries
   set_fact:
-    pre_processed_datadog_apm_libraries: "{{
-      (pre_processed_datadog_apm_libraries |
-      default([], true)) + [(item | regex_replace('[:]latest', '')) +
-      ('-1' if (item.split(':')  | length > 1 and
-      item.split(':')[1] != 'latest') else '')] }}"
+    pre_processed_datadog_apm_libraries: "{{ (pre_processed_datadog_apm_libraries | default([], true)) + [(item | regex_replace('[:]latest', '')) + ('-1' if (item.split(':')\
+      \  | length > 1 and item.split(':')[1] != 'latest') else '')] }}"
   loop: "{{ datadog_apm_instrumentation_libraries }}"
   when: not ansible_check_mode
